@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Functions SiteId="2000003" SiteName="OH">
+  <Function Name="GOTO">
+    <Setting Key="OH_ClickStatistics_RedirectPage_Sel" SpName="OH_ClickStatistics_RedirectPage_Sel_UAT1" DbName="DBOH.ONEHub.wsv_oh" Plain="0" />
+    <Setting Key="OH_ClickStatisticsIns" SpName="OH_ClickStatisticsIns_UAT1" DbName="DBOH.ONEHub.wsv_oh" Plain="0" />
+    <Setting Key="OH_ClickStatistics_BulkCache" SpName="OH_ClickStatistics_BulkCache_UAT1" DbName="DBOH.ONEHub.wsv_oh" />
+	<Setting Key="OH_ClickStatistics_MaxClickId_Sel" SpName="OH_ClickStatistics_MaxClickId_Sel_UAT1" DbName="DBOH.ONEHub.wsv_oh" />
+	<Setting Key="OH_ClickStatisticsPatterns_Upd" SpName="OH_ClickStatisticsPatterns_Upd_UAT1" DbName="DBOH.ONEHub.wsv_oh" />
+	<Setting Key="OH_ClickStatisticsPatterns_Sel" SpName="OH_ClickStatisticsPatterns_Sel_UAT1" DbName="DBOH.ONEHub.wsv_oh" />
+  </Function>
+</Functions>

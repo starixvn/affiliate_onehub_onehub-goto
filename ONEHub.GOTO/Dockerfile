@@ -1,0 +1,38 @@
+FROM hub.nexdev.net/base/dotnet/core/sdk:9.0-alpine AS builder
+WORKDIR /src
+
+COPY *.sln .
+COPY ONEHub.GOTO/ONEHub.GOTO.csproj ./ONEHub.GOTO/
+COPY ONEHub.GOTO.Core/ONEHub.GOTO.Core.csproj ./ONEHub.GOTO.Core/
+COPY onehub-shared/ONEHub.Shared/ONEHub.GOTO.Core.csproj ./onehub-shared/ONEHub.Shared/
+
+RUN dotnet nuget add source https://nuget.nexdev.net/api/v2
+
+RUN dotnet restore -v n ./ONEHub.GOTO/ONEHub.GOTO.csproj
+
+COPY ONEHub.GOTO/. ./ONEHub.GOTO/
+COPY ONEHub.GOTO.Core/. ./ONEHub.GOTO.Core/
+COPY onehub-shared/ONEHub.Shared/. ./onehub-shared/ONEHub.Shared/
+
+WORKDIR /src/ONEHub.GOTO
+
+RUN dotnet publish -v n -r linux-x64 --self-contained false -o /app
+
+FROM hub.nexdev.net/base/dotnet/core/aspnet:9.0-alpine AS base
+
+RUN adduser --disabled-password \
+  --home /app \
+  --gecos '' dotnetuser && chown -R dotnetuser /app
+
+USER dotnetuser
+
+ENV DOTNET_HOSTBUILDER__RELOADCONFIGONCHANGE=false
+ENV ASPNETCORE_URLS=http://+:5000
+EXPOSE 5000
+
+WORKDIR /app
+COPY --from=builder /app .
+
+ENV TZ="America/La_Paz"
+
+ENTRYPOINT ["dotnet", "ONEHub.GOTO.dll"]

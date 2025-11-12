@@ -1,0 +1,242 @@
+@using ONEHub.GOTO.Helpers
+@using System.Globalization
+@model ONEHub.GOTO.Models.HealthCheck.HealthStatus
+@{
+    ViewData["Title"] = "System Health Dashboard";
+    var statusColor = Model.Status switch
+    {
+        "Healthy" => "success",
+        "Warning" => "warning", 
+        "Unhealthy" => "danger",
+        _ => "secondary"
+    };
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Fanex Affiliate Link</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .component-card {
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+        .component-card.healthy { border-left-color: #28a745; }
+        .component-card.warning { border-left-color: #ffc107; }
+        .component-card.unhealthy { border-left-color: #dc3545; }
+        .metric-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .status-icon {
+            font-size: 1.2em;
+            margin-right: 8px;
+        }
+        .refresh-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid py-4">
+        <!-- Header -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-heartbeat text-@statusColor"></i>
+                        System Health Dashboard
+                    </h1>
+                    <div class="d-flex align-items-center">
+                        <span class="badge bg-@statusColor fs-6 me-3">@Model.Status</span>
+                        <small class="text-muted">
+                            <i class="fas fa-clock"></i>
+                            Last updated: @DateTimeHelper.ServerTime.ToString("yyyy-MM-dd HH:mm:ss")
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Overall Status -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card border-@statusColor">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-md-3 text-center">
+                                <i class="fas fa-server fa-3x text-@statusColor mb-2"></i>
+                                <h4 class="text-@statusColor">@Model.Status</h4>
+                            </div>
+                            <div class="col-md-9">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <h6 class="text-muted mb-1">Summary</h6>
+                                        <p class="mb-0">@Model.Summary</p>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <h6 class="text-muted mb-1">Check Duration</h6>
+                                        <p class="mb-0">@Model.TotalDuration.TotalMilliseconds.ToString("F0")ms</p>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <h6 class="text-muted mb-1">Uptime</h6>
+                                        <p class="mb-0">@Model.Metrics.Uptime.ToString(@"d\.hh\:mm\:ss")</p>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <h6 class="text-muted mb-1">Environment</h6>
+                                        <p class="mb-0">@Model.Metrics.Environment</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- System Metrics -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card metric-card">
+                    <div class="card-body text-center">
+                        <i class="fas fa-memory fa-2x mb-2"></i>
+                        <h6>Memory Usage</h6>
+                        <h4>@((Model.Metrics.MemoryUsedBytes / 1024.0 / 1024.0).ToString("F1")) MB</h4>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card metric-card">
+                    <div class="card-body text-center">
+                        <i class="fas fa-microchip fa-2x mb-2"></i>
+                        <h6>Active Threads</h6>
+                        <h4>@Model.Metrics.ActiveThreads</h4>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card metric-card">
+                    <div class="card-body text-center">
+                        <i class="fas fa-code-branch fa-2x mb-2"></i>
+                        <h6>Version</h6>
+                        <h4>@Model.Metrics.Version</h4>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card metric-card">
+                    <div class="card-body text-center">
+                        <i class="fas fa-clock fa-2x mb-2"></i>
+                        <h6>Uptime</h6>
+                        <h4>@Model.Metrics.Uptime.Days d</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Component Health -->
+        <div class="row">
+            <div class="col-12">
+                <h5 class="mb-3">Component Health Status</h5>
+            </div>
+            @foreach (var component in Model.Components.Select(c => c.Value))
+            {
+                var componentStatusColor = component.Status.ToLower(CultureInfo.InvariantCulture) switch
+                {
+                    "healthy" => "success",
+                    "warning" => "warning",
+                    "unhealthy" => "danger",
+                    _ => "secondary"
+                };
+                var iconClass = component.Status.ToLower(CultureInfo.InvariantCulture) switch
+                {
+                    "healthy" => "fas fa-check-circle",
+                    "warning" => "fas fa-exclamation-triangle", 
+                    "unhealthy" => "fas fa-times-circle",
+                    _ => "fas fa-question-circle"
+                };
+                
+                <div class="col-md-6 col-lg-4 mb-3">
+                    <div class="card component-card @component.Status.ToLower(CultureInfo.InvariantCulture) h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h6 class="card-title mb-0">
+                                    <i class="@iconClass status-icon text-@componentStatusColor"></i>
+                                    @component.Name
+                                </h6>
+                                <span class="badge bg-@componentStatusColor">@component.Status</span>
+                            </div>
+                            <p class="card-text text-muted small mb-2">@component.Description</p>
+                            @if (!string.IsNullOrEmpty(component.ErrorMessage))
+                            {
+                                <div class="alert alert-danger py-1 px-2 small mb-2">
+                                    @component.ErrorMessage
+                                </div>
+                            }
+                            <div class="row small text-muted">
+                                <div class="col-6">
+                                    <i class="fas fa-stopwatch"></i>
+                                    @component.ResponseTime.TotalMilliseconds.ToString("F1")ms
+                                </div>
+                                <div class="col-6 text-end">
+                                    <i class="fas fa-clock"></i>
+                                    @component.LastChecked.ToString("HH:mm:ss")
+                                </div>
+                            </div>
+                            @if (component.Data.Any())
+                            {
+                                <details class="mt-2">
+                                    <summary class="small text-muted" style="cursor: pointer;">Additional Data</summary>
+                                    <div class="mt-1 small">
+                                        @foreach (var data in component.Data)
+                                        {
+                                            <div><strong>@data.Key:</strong> @data.Value</div>
+                                        }
+                                    </div>
+                                </details>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        @if (!string.IsNullOrEmpty(ViewBag.Error as string))
+        {
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <strong>Error:</strong> @ViewBag.Error
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- Refresh Button -->
+    <button class="btn btn-primary refresh-btn" onclick="location.reload()">
+        <i class="fas fa-sync-alt"></i>
+    </button>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Auto-refresh every 30 seconds
+        setTimeout(function() {
+            location.reload();
+        }, 30000);
+        
+        // Add loading state to refresh button
+        document.querySelector('.refresh-btn').addEventListener('click', function() {
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        });
+    </script>
+</body>
+</html>

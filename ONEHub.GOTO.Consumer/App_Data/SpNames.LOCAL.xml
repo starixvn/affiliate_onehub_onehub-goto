@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Functions SiteId="2000003" SiteName="OH">
+	<Function Name="GOTO">
+		<Setting Key="OH_ClickStatisticsIns" SpName="OH_ClickStatisticsIns" DbName="DBOH.ONEHub.wsv_oh" Plain="0" />
+	</Function>
+</Functions>
