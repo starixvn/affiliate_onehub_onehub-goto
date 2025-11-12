@@ -24,7 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\onehub-shared\ONEHub.Shared\ONEHub.Shared.csproj" />
+    <ProjectReference Include="..\ONEHub.Shared\ONEHub.Shared.csproj" />
   </ItemGroup>
 
 </Project>
