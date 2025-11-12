@@ -147,7 +147,7 @@ public class HomeController(
             BrowserVersion = HttpContext.GetBrowserVersion(),
             Device = HttpContext.GetDeviceName(),
             DomainReferrer = HttpContext.GetDomainReferrer(),
-            URLReferrer = HttpContext.GetURLReferrer(),
+            URLReferrer = HttpContext.GetURLReferrer()?.ToString() ?? string.Empty,
             DeviceType = HttpContext.IsMobile() ? (byte)1 : (byte)0,
             OS = HttpContext.GetOsName(),
             UpdatedTime = DateTimeOffset.UtcNow.DateTime,

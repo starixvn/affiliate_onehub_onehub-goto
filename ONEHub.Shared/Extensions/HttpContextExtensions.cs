@@ -72,7 +72,7 @@ public static class HttpContextExtensions
         return userAgent ?? string.Empty;
     }
 
-    public static string GetURLReferrer(this HttpContext httpContext)
+    public static Uri? GetURLReferrer(this HttpContext httpContext)
     {
         var urlReferrer = httpContext.Request.Headers["Referer"].ToString();
         if (string.IsNullOrEmpty(urlReferrer))
@@ -80,16 +80,25 @@ public static class HttpContextExtensions
             urlReferrer = httpContext.Request.Query["ref"].ToString();
         }
 
-        return urlReferrer ?? string.Empty;
+        if (string.IsNullOrEmpty(urlReferrer))
+        {
+            return null;
+        }
+
+        if (Uri.TryCreate(urlReferrer, UriKind.Absolute, out var uri))
+        {
+            return uri;
+        }
+
+        return null;
     }
 
     public static string GetDomainReferrer(this HttpContext httpContext)
     {
         var urlReferrer = GetURLReferrer(httpContext);
-        if (Uri.IsWellFormedUriString(urlReferrer, UriKind.Absolute))
+        if (urlReferrer != null && !string.IsNullOrEmpty(urlReferrer.Host))
         {
-            var referrerUri = new Uri(urlReferrer);
-            return string.IsNullOrEmpty(referrerUri.Host) ? string.Empty : referrerUri.Host;
+            return urlReferrer.Host;
         }
 
         return string.Empty;

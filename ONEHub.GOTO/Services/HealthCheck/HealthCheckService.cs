@@ -18,7 +18,6 @@ namespace ONEHub.GOTO.Services.HealthCheck
         private readonly IRedisService _redisService;
         private readonly IRabbitBus _rabbitBus;
         private readonly IMaintenanceService _maintenanceService;
-        private readonly IHealthCheckConfigurationService _configService;
         private readonly ILogger<HealthCheckService> _logger;
         private readonly DateTime _startTime;
 
@@ -27,14 +26,12 @@ namespace ONEHub.GOTO.Services.HealthCheck
             IRedisService redisService,
             IRabbitBus rabbitBus,
             IMaintenanceService maintenanceService,
-            IHealthCheckConfigurationService configService,
             ILogger<HealthCheckService> logger)
         {
             _dynamicRepository = dynamicRepository ?? throw new ArgumentNullException(nameof(dynamicRepository));
             _redisService = redisService ?? throw new ArgumentNullException(nameof(redisService));
             _rabbitBus = rabbitBus ?? throw new ArgumentNullException(nameof(rabbitBus));
             _maintenanceService = maintenanceService ?? throw new ArgumentNullException(nameof(maintenanceService));
-            _configService = configService ?? throw new ArgumentNullException(nameof(configService));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _startTime = DateTimeHelper.ServerTime;
         }
@@ -291,66 +288,6 @@ namespace ONEHub.GOTO.Services.HealthCheck
             }
 
             return componentsList.TrueForAll(c => c.IsHealthy) ? HealthyStatus : UnknownStatus;
-        }
-
-        private async Task CheckForAlertsAsync(HealthStatus healthStatus)
-        {
-            // Memory conversion constants
-            const int BytesToKB = 1024;
-            const int KBToMB = 1024;
-            const string CriticalSeverity = "Critical";
-            const string WarningSeverity = "Warning";
-
-            try
-            {
-                if (!_configService.GetConfiguration().EnableAlerts)
-                {
-                    return;
-                }
-
-                var thresholds = _configService.GetThresholds();
-
-                // Check for unhealthy components
-                foreach (var component in healthStatus.Components.Where(c => c.Value.IsUnhealthy))
-                {
-                    await _configService.SendAlertAsync(
-                        component.Key,
-                        $"Component is unhealthy: {component.Value.ErrorMessage}",
-                        CriticalSeverity);
-                }
-
-                // Check for performance thresholds
-                if (healthStatus.Metrics.MemoryUsedBytes / BytesToKB / KBToMB > thresholds.MemoryUsageMB)
-                {
-                    await _configService.SendAlertAsync(
-                        "system",
-                        $"High memory usage: {healthStatus.Metrics.MemoryUsedBytes / BytesToKB / KBToMB}MB",
-                        WarningSeverity);
-                }
-
-                if (healthStatus.Metrics.ActiveThreads > thresholds.ActiveThreadsCritical)
-                {
-                    await _configService.SendAlertAsync(
-                        "system",
-                        $"Critical thread count: {healthStatus.Metrics.ActiveThreads}",
-                        CriticalSeverity);
-                }
-                else if (healthStatus.Metrics.ActiveThreads > thresholds.ActiveThreadsWarning)
-                {
-                    await _configService.SendAlertAsync(
-                        "system",
-                        $"High thread count: {healthStatus.Metrics.ActiveThreads}",
-                        WarningSeverity);
-                }
-                else
-                {
-                    // Thread count is within normal range - no action needed
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Failed to check for alerts");
-            }
         }
     }
 }
