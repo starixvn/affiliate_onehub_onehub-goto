@@ -24,7 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="D:\GitLab\onehub-goto\onehub-shared\ONEHub.Shared\ONEHub.Shared.csproj" />
+    <ProjectReference Include="..\onehub-shared\ONEHub.Shared\ONEHub.Shared.csproj" />
   </ItemGroup>
 
 </Project>
