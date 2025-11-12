@@ -4,9 +4,9 @@ namespace ONEHub.GOTO.Core.Services.Interfaces;
 
 public interface IRedirectLinkService
 {
-    Task<RedirectLink> GetRedirectLink(string linkCode);
+    Task<RedirectLink> GetRedirectLink(string shortPath);
 
-    Task<RedirectLink> GetRedirectLinkFromDatabase(string linkCode);
+    Task<RedirectLink> GetRedirectLinkFromDatabase(string shortPath);
 
     Task<IEnumerable<RedirectLink>> GetAllRedirectLink();
 

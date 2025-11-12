@@ -16,23 +16,23 @@ public class RedirectLinkService(IDynamicRepository dynamicRepository,
 {
     private const int cacheDurationInSeconds = 86400;
 
-    public async Task<RedirectLink> GetRedirectLink(string linkCode)
+    public async Task<RedirectLink> GetRedirectLink(string shortPath)
     {
-        var cacheKey = cacheKeyService.GetFullKey(CacheKey.REDIRECTLINK, linkCode);
+        var cacheKey = cacheKeyService.GetFullKey(CacheKey.REDIRECTLINK, shortPath);
         var redirectLink = await redisService.GetAsync<RedirectLink>(cacheKey);
         if (redirectLink is null)
         {
-            redirectLink = await GetRedirectLinkFromDatabase(linkCode);
+            redirectLink = await GetRedirectLinkFromDatabase(shortPath);
             await redisService.SetAsync(cacheKey, redirectLink);
         }
         return redirectLink;
     }
 
-    public async Task<RedirectLink> GetRedirectLinkFromDatabase(string linkCode)
+    public async Task<RedirectLink> GetRedirectLinkFromDatabase(string shortPath)
     {
         var criteria = new GetRedirectInfoByShortLinkCriteria
         {
-            LinkCode = linkCode
+            ShortPath = shortPath
         };
         var redirectLink = await dynamicRepository.GetAsync<RedirectLink>(criteria);
         return redirectLink;
@@ -59,7 +59,7 @@ public class RedirectLinkService(IDynamicRepository dynamicRepository,
 
         foreach (var redirectLink in newRedirectLinks)
         {
-            var cacheKey = cacheKeyService.GetFullKey(CacheKey.REDIRECTLINK, redirectLink.ShortLink);
+            var cacheKey = cacheKeyService.GetFullKey(CacheKey.REDIRECTLINK, redirectLink.ShortPath);
             await redisService.SetAsync(cacheKey, redirectLink);
         }
         

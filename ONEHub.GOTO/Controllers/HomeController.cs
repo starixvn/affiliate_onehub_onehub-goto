@@ -124,10 +124,10 @@ public class HomeController(
     private async Task<IActionResult> ProcessRedirectLink(RedirectLink redirectLink)
     {
         var clickTrackingEvent = await GetTrackingEvent(redirectLink);
-        await redirectLinkService.PublishMessage(clickTrackingEvent).ConfigureAwait(false);
-
         var forwardQueryString = Request.QueryString.Value.Replace("?", "&");
         var fullLink = $"{redirectLink.FullLink}&clickId={clickTrackingEvent.ClickId}{forwardQueryString}";
+        clickTrackingEvent.RedirectURL = fullLink;
+        await redirectLinkService.PublishMessage(clickTrackingEvent).ConfigureAwait(false);
         return Redirect(fullLink);
     }
 
@@ -151,7 +151,7 @@ public class HomeController(
             DeviceType = HttpContext.IsMobile() ? (byte)1 : (byte)0,
             OS = HttpContext.GetOsName(),
             UpdatedTime = DateTimeOffset.UtcNow.DateTime,
-            RedirectURL = string.Empty
+            RedirectURL = redirectLink.FullLink
         };
         return clickTrackingEvent;
     }

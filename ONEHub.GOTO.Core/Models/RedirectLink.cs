@@ -2,9 +2,9 @@
 
 public class RedirectLink
 {
-    public string LinkCode { get; set; }
+    public string ShortPath { get; set; } = string.Empty;
 
-    public string ShortLink { get; set; } = string.Empty;
+    public string ShortDomain { get; set; } = string.Empty;
 
     public int LinkId { get; set; }
 
