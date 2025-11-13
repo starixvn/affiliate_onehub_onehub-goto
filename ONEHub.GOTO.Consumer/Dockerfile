@@ -4,7 +4,7 @@ WORKDIR /src
 COPY *.sln .
 COPY ONEHub.GOTO.Consumer/ONEHub.GOTO.Consumer.csproj ./ONEHub.GOTO.Consumer/
 COPY ONEHub.GOTO.Core/ONEHub.GOTO.Core.csproj ./ONEHub.GOTO.Core/
-COPY onehub-shared/ONEHub.Shared/ONEHub.GOTO.Core.csproj ./onehub-shared/ONEHub.Shared/
+COPY onehub-shared/ONEHub.Shared/ONEHub.Shared.csproj ./onehub-shared/ONEHub.Shared/
 
 RUN dotnet nuget add source https://nuget.nexdev.net/api/v2
 
