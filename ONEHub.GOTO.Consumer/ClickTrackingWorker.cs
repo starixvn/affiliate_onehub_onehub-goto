@@ -2,10 +2,8 @@
 using EasyNetQ.Consumer;
 using EasyNetQ.Topology;
 using ONEbook.UM.Services;
-using ONEHub.GOTO.Core.Constants;
 using ONEHub.GOTO.Core.Models;
 using ONEHub.GOTO.Core.Services.Interfaces;
-using ONEHub.Shared.Services;
 using ONEHub.Shared.Services.Interfaces;
 
 namespace ONEHub.GOTO.Consumer;
