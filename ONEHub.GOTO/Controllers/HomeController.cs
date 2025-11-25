@@ -124,11 +124,25 @@ public class HomeController(
     private async Task<IActionResult> ProcessRedirectLink(RedirectLink redirectLink)
     {
         var clickTrackingEvent = await GetTrackingEvent(redirectLink);
-        var forwardQueryString = Request.QueryString.Value.Replace("?", "&");
-        var fullLink = $"{redirectLink.FullLink}&clickId={clickTrackingEvent.ClickId}{forwardQueryString}";
+        string fullLink = GenerateRequiredLinkParams(redirectLink, clickTrackingEvent);
         clickTrackingEvent.RedirectURL = fullLink;
         await redirectLinkService.PublishMessage(clickTrackingEvent).ConfigureAwait(false);
         return Redirect(fullLink);
+    }
+
+    private string GenerateRequiredLinkParams(RedirectLink redirectLink, ClickTrackingEvent clickTrackingEvent)
+    {
+        var forwardQueryString = Request.QueryString.Value.Replace("?", "&");
+        var uri = new Uri(redirectLink.FullLink);
+        var query = Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(uri.Query);
+        var idcode = query.ContainsKey("idcode") ? query["idcode"].ToString() : string.Empty;
+        var baseUrl = uri.GetLeftPart(UriPartial.Path);
+        var idcodeParam = !string.IsNullOrEmpty(idcode) ? $"?idcode={idcode}" : "";
+        var clickIdParam = (string.IsNullOrEmpty(idcode) ? "?" : "&") + $"clickId={clickTrackingEvent.ClickId}";
+        var forwardQS = string.IsNullOrEmpty(forwardQueryString) ? "" : forwardQueryString;
+        
+        var fullLink = $"{baseUrl}{idcodeParam}{clickIdParam}{forwardQS}";
+        return fullLink;
     }
 
     private async Task<ClickTrackingEvent> GetTrackingEvent(RedirectLink redirectLink)

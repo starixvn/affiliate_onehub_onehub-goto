@@ -222,12 +222,12 @@ public sealed class BotDetectionService (
             return true;
         }
 
-        var deviceDetector = new DeviceDetector(userAgent);
-        deviceDetector.Parse();
-        if (deviceDetector.IsBot())
-        {
-            return true;
-        }
+        ////var deviceDetector = new DeviceDetector(userAgent);
+        ////deviceDetector.Parse();
+        ////if (deviceDetector.IsBot())
+        ////{
+        ////    return true;
+        ////}
 
         return false;
     }
