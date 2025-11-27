@@ -138,7 +138,7 @@ public class HomeController(
         var idcode = query.ContainsKey("idcode") ? query["idcode"].ToString() : string.Empty;
         var baseUrl = uri.GetLeftPart(UriPartial.Path);
         var idcodeParam = !string.IsNullOrEmpty(idcode) ? $"?idcode={idcode}" : "";
-        var clickIdParam = (string.IsNullOrEmpty(idcode) ? "?" : "&") + $"clickId={clickTrackingEvent.ClickId}";
+        var clickIdParam = (string.IsNullOrEmpty(idcode) ? "?" : "&") + $"oClickId={clickTrackingEvent.ClickId}&oLinkId={redirectLink.LinkId}";
         var forwardQS = string.IsNullOrEmpty(forwardQueryString) ? "" : forwardQueryString;
         
         var fullLink = $"{baseUrl}{idcodeParam}{clickIdParam}{forwardQS}";
