@@ -80,7 +80,6 @@ public class RedirectLinkService(IDynamicRepository dynamicRepository,
     public async Task<long> SyncMaxClickId(bool isSync)
     {
         const int ClickIdIncrement = 100;
-
         var clickIdFromDatabase = await GetMaxClickIdFromDatabase();
         clickIdFromDatabase += ClickIdIncrement;
         if (isSync)

@@ -1,5 +1,4 @@
-﻿using DeviceDetectorNET;
-using Fanex.Data.Repository;
+﻿using Fanex.Data.Repository;
 using Microsoft.AspNetCore.Http;
 using NetCrawlerDetect;
 using ONEHub.GOTO.Core.Commands;

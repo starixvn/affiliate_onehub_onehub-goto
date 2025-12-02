@@ -164,7 +164,7 @@ public class HomeController(
             URLReferrer = HttpContext.GetURLReferrer()?.ToString() ?? string.Empty,
             DeviceType = HttpContext.IsMobile() ? (byte)1 : (byte)0,
             OS = HttpContext.GetOsName(),
-            UpdatedTime = DateTimeOffset.UtcNow.DateTime,
+            UpdatedTime = DateTimeOffset.UtcNow.DateTime.AddHours(8),
             RedirectURL = redirectLink.FullLink
         };
         return clickTrackingEvent;
